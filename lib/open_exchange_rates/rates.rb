@@ -18,10 +18,12 @@ module OpenExchangeRates
     end
 
     attr_reader :app_id
+    attr_reader :connection_options
 
     def initialize(options = {})
       if options.kind_of? Hash
         @app_id = options[:app_id] || OpenExchangeRates.configuration.app_id
+        @connection_options = options[:connection_options] || {}
       else
         warn "[DEPRECATION] `OpenExchangeRates::Rates.new('myappid')` is deprecated.  Please use `OpenExchangeRates::Rates.new(:app_id => 'myappid')` instead."
         @app_id = options
@@ -91,12 +93,12 @@ module OpenExchangeRates
 
     def parse_latest
       @latest_parser ||= OpenExchangeRates::Parser.new
-      @latest_parser.parse(open("#{OpenExchangeRates::LATEST_URL}?app_id=#{@app_id}"))
+      @latest_parser.parse(open("#{OpenExchangeRates::LATEST_URL}?app_id=#{@app_id}", **connection_options))
     end
 
     def parse_on(date_string)
       @on_parser = OpenExchangeRates::Parser.new
-      @on_parser.parse(open("#{OpenExchangeRates::BASE_URL}/historical/#{date_string}.json?app_id=#{@app_id}"))
+      @on_parser.parse(open("#{OpenExchangeRates::BASE_URL}/historical/#{date_string}.json?app_id=#{@app_id}", **connection_options))
     end
 
   end
